@@ -22,22 +22,21 @@ app.get("/", function (req, res) {
 app.get("/api/hello", function (req, res) {
   res.json({ greeting: "hello API" });
 });
+app.get("/api", (req, res) => {
+  const date = new Date();
+  res.json({ unix: date.valueOf(), utc: `${date.toUTCString()}` });
+});
 app.get("/api/:date", (req, res) => {
   let date;
-  if (!req.params.date) {
-    date = new Date();
+  if (!isNaN(Number(req.params.date))) {
+    date = new Date(Number(req.params.date));
     res.json({ unix: date.valueOf(), utc: `${date.toUTCString()}` });
   } else {
-    if (!isNaN(Number(req.params.date))) {
-      date = new Date(Number(req.params.date));
-      res.json({ unix: date.valueOf(), utc: `${date.toUTCString()}` });
+    date = new Date(req.params.date);
+    if (date.toUTCString() === "Invalid Date") {
+      res.json({ error: date.toUTCString() });
     } else {
-      date = new Date(req.params.date);
-      if (date.toUTCString() === "Invalid Date") {
-        res.json({ error: date.toUTCString() });
-      } else {
-        res.json({ unix: date.valueOf(), utc: `${date.toUTCString()}` });
-      }
+      res.json({ unix: date.valueOf(), utc: `${date.toUTCString()}` });
     }
   }
 });
